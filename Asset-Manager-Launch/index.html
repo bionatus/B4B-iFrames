@@ -1,0 +1,538 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Asset Manager Launch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Montserrat:wght@700&display=swap">
+<style>
+/* Layout: full-bleed hero section (sits inside the Bluon app, below search) —
+   centered copy, then a media "stage" pinned to the bottom edge: the demo screen
+   (video) sits behind the phone. A scripted story loops: cursor taps "Add Asset",
+   phone drops away, demo screen sharpens and plays. Scrolling expands the screen
+   to ~90% of the viewport height and snaps there.
+   Single committed look: deep-blue hero. Not theme-switched on purpose. */
+:root {
+  color-scheme: light;
+  --bluon: #1460F5;
+  --ink: #1B2235;
+  --hero-deep: #071A4F;
+  --on-hero: #FFFFFF;
+  --on-hero-soft: rgba(255,255,255,.88);
+  --cta: #34F08C;
+  --cta-ink: #04142E;
+  --screen-edge: rgba(255,255,255,.55);
+
+  --f-display: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --gutter: clamp(16px, 2vw, 24px);
+  --ease-out: cubic-bezier(.2, .8, .2, 1);
+  --ease-in: cubic-bezier(.55, 0, .8, .2);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--hero-deep);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--bluon); outline-offset: 2px; }
+
+/* ───────── Scroll track ─────────
+   The track is two screens tall; the hero sticks to the top while the extra
+   screen of scroll drives the "expand" progress (0 → 1). */
+.am-track { position: relative; height: 200vh; height: 200svh; }
+
+/* ───────── Hero ─────────
+   Everything is sized from one unit (--u) that tracks whichever of width/height
+   is tighter, so the composition scales as one piece. */
+.hero {
+  --u: min(1vw, 1.55vh);
+  --u: min(1vw, 1.55svh);
+  --phone-w: calc(var(--u) * 26);
+  --screen-ar: 16 / 9;
+  --screen-w: min(calc(var(--phone-w) * 2.35), calc(100vw - 24px));
+  --screen-grow: 1.14;
+  position: sticky; top: 0;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex; flex-direction: column;
+  height: 100vh;
+  height: 100svh;
+  min-height: 520px;
+  background: var(--hero-deep);
+  color: var(--on-hero);
+  padding-inline: var(--gutter);
+}
+/* Background: static color blur + looping binary-wave video on top.
+   The waves are white-on-black, so `screen` drops the black. */
+.hero-bg {
+  --waves-opacity: .08;
+  position: absolute; inset: 0; z-index: -1;
+  overflow: hidden;
+  background: var(--hero-deep) url("assets/hero-blur.jpg") center / cover no-repeat;
+}
+.hero-waves {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  mix-blend-mode: screen;
+  opacity: var(--waves-opacity);
+  pointer-events: none;
+}
+
+.copy {
+  flex: 1 1 auto; min-height: 0;
+  width: 100%; max-width: max(min(100%, 560px), calc(var(--u) * 56)); margin-inline: auto;
+  padding-block: calc(var(--u) * 3) calc(var(--u) * 3.5);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  will-change: opacity, transform;
+}
+.eyebrow {
+  margin: 0 0 max(16px, calc(var(--u) * 2));
+  font: 400 max(12px, calc(var(--u) * 1))/1.2 var(--f-mono);
+  letter-spacing: .08em; text-transform: uppercase;
+}
+h1 {
+  margin: 0;
+  font: 700 max(26px, calc(var(--u) * 2.9))/1.12 var(--f-display);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.lede {
+  margin: max(14px, calc(var(--u) * 1.7)) 0 0;
+  max-width: min(100%, max(320px, calc(var(--u) * 48)));
+  font: 400 max(15px, calc(var(--u) * 1.2))/1.45 var(--f-body);
+  color: var(--on-hero-soft);
+  text-wrap: pretty;
+}
+.lede span { display: block; }
+.cta {
+  margin-top: max(20px, calc(var(--u) * 2.1));
+  display: inline-flex; align-items: center; justify-content: center;
+  height: max(42px, calc(var(--u) * 2.9)); padding-inline: max(22px, calc(var(--u) * 1.6));
+  border-radius: 999px;
+  background: var(--cta); color: var(--cta-ink);
+  font: 600 max(16px, calc(var(--u) * 1.12))/1 var(--f-body); text-decoration: none;
+  box-shadow: 0 6px 24px rgba(52,240,140,.25);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.cta:hover { transform: translateY(-1px); box-shadow: 0 10px 32px rgba(52,240,140,.38); }
+.cta-note {
+  margin: max(10px, calc(var(--u) * .8)) 0 0;
+  font: 400 max(11px, calc(var(--u) * .8))/1 var(--f-mono); letter-spacing: .04em;
+  color: var(--on-hero-soft);
+}
+
+/* ───────── Media stage ─────────
+   Pinned to the hero's bottom edge; shows the top ~60% of the phone. */
+.stage {
+  position: relative;
+  flex: none;
+  width: 100%;
+  height: calc(var(--phone-w) * 1.506 * .6);
+}
+
+/* Demo screen. Three nested layers so each motion has one owner:
+   .screen-anchor  – layout box (never animated; JS measures it)
+   .screen-scroll  – scroll-driven expand (transform set by JS)
+   .screen-story   – story state: blurred/idle ↔ sharp/playing (CSS transitions) */
+.screen-anchor {
+  position: absolute; left: 50%; top: calc(var(--phone-w) * .07);
+  width: var(--screen-w);
+  aspect-ratio: var(--screen-ar);
+  max-width: none;
+  transform: translateX(-50%);
+}
+.screen-scroll {
+  position: absolute; inset: 0;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+.screen-story {
+  position: absolute; inset: 0;
+  transform-origin: 50% 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #F4F6FA;
+  box-shadow: 0 0 0 1px var(--screen-edge), 0 30px 80px rgba(3, 12, 44, .45);
+  filter: blur(7px);
+  opacity: .78;
+  transition:
+    filter .9s var(--ease-out),
+    opacity .6s ease,
+    transform .9s var(--ease-out);
+}
+.screen-story video {
+  display: block; width: 100%; height: 100%;
+  object-fit: cover; max-width: none;
+}
+.hero.is-playing .screen-story,
+.hero.is-expanded .screen-story {
+  filter: blur(0);
+  opacity: 1;
+  transform: scale(var(--screen-grow));
+}
+
+/* Phone. The PNG has a drop shadow on its right side, so the device body sits
+   ~5.6% right of the image's center; shift left by that much to center it. */
+.media-phone {
+  position: absolute; left: 50%; top: 0;
+  width: var(--phone-w);
+  transform: translateX(calc(-50% - 5.64%));
+  transition: transform .8s var(--ease-out), opacity .5s ease;
+}
+.media-phone > img { display: block; width: 100%; height: auto; max-width: none; }
+.hero.phone-out .media-phone {
+  transform: translateX(calc(-50% - 5.64%)) translateY(45%);
+  opacity: 0;
+  transition: transform .42s var(--ease-in), opacity .3s ease-in;
+}
+
+/* "Add Asset" tap target, positioned over the + button in the phone PNG */
+.tap-target {
+  position: absolute; left: 76.45%; top: 30.07%;
+  width: 5.8%; aspect-ratio: 1;
+  transform: translate(-50%, -50%) scale(.9);
+  border-radius: 50%;
+  background: var(--bluon);
+  display: grid; place-items: center;
+  opacity: 0;
+  transition: opacity .15s ease, transform .2s var(--ease-out);
+}
+.tap-target svg { width: 46%; height: 46%; }
+.hero.is-tapping .tap-target { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+/* Cursor: a soft touch-dot that glides in, presses, and ripples */
+.cursor {
+  position: absolute;
+  left: 62%; top: 46%;
+  width: 9%; aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    left .6s cubic-bezier(.3, .1, .2, 1),
+    top .6s cubic-bezier(.3, .1, .2, 1),
+    opacity .18s ease;
+}
+.cursor svg { width: 100%; height: 100%; overflow: visible; transition: transform .14s ease; }
+.cursor .ripple { transform-origin: 50% 50%; transform-box: fill-box; opacity: 0; }
+.hero.cursor-in .cursor { opacity: 1; left: 76.45%; top: 30.07%; }
+.hero.cursor-show .cursor { opacity: 1; }
+.hero.is-pressing .cursor svg { transform: scale(.78); }
+.hero.is-pressing .cursor .ripple { animation: ripple .6s ease-out forwards; }
+@keyframes ripple {
+  0%   { opacity: .9; transform: scale(.6); }
+  100% { opacity: 0;  transform: scale(2.3); }
+}
+
+/* Close button for the expanded state; JS positions it beside the screen */
+.screen-close {
+  position: absolute; z-index: 5;
+  left: 0; top: 0;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.35);
+  background: rgba(7, 26, 79, .55);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  color: var(--on-hero);
+  display: grid; place-items: center;
+  cursor: pointer;
+  opacity: 0; visibility: hidden;
+  transform: scale(.85);
+  transition: opacity .25s ease, transform .25s var(--ease-out), visibility 0s linear .25s, background .15s ease;
+}
+.screen-close svg { width: 16px; height: 16px; }
+.screen-close:hover { background: rgba(20, 96, 245, .85); }
+.hero.is-expanded .screen-close {
+  opacity: 1; visibility: visible; transform: scale(1);
+  transition: opacity .25s ease, transform .25s var(--ease-out), visibility 0s, background .15s ease;
+}
+
+/* ───────── Responsive ─────────
+   Portrait (phones, portrait tablets): width is the tight side. The phone gets a
+   bigger share, the demo screen spans the width, and it grows less in the story
+   (it's already near full width). Expanded, it fits the width (a 16:9 screen can't
+   reach 90% height on a portrait display without cropping the demo). */
+@media (max-aspect-ratio: 4/5) {
+  .hero {
+    --phone-w: min(72vw, 36svh);
+    --screen-w: calc(100vw - 2 * var(--gutter));
+    --screen-grow: 1.04;
+  }
+  .copy { max-width: 560px; }
+  .lede span { display: inline; }
+}
+
+/* Tablet (portrait and landscape) */
+@media (min-width: 641px) and (max-width: 1024px) {
+  h1 { font-size: 32px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+</style>
+
+<main id="top" class="am-track">
+  <section class="hero" id="hero" aria-labelledby="hero-title">
+    <div class="hero-bg" aria-hidden="true">
+      <video class="hero-waves" src="assets/binary-waves.mp4" autoplay muted loop playsinline preload="auto" disablepictureinpicture></video>
+    </div>
+
+    <div class="copy" id="copy">
+      <p class="eyebrow">Introducing Asset Manager</p>
+      <h1 id="hero-title">Bluon now turns your model numbers into new opportunities!</h1>
+      <p class="lede">
+        <span>Your equipment list is a job list. Send it over and we’ll flag aging units, R‑22 systems, expiring warranties, and which ones are ready to replace. No tech adoption required.</span>
+        <span>No List? We’ll pull it from your FSM.</span>
+      </p>
+      <a class="cta" href="#top">Show me how!</a>
+      <p class="cta-note">15-minute demo</p>
+    </div>
+
+    <div class="stage">
+      <div class="screen-anchor" id="screenAnchor">
+        <div class="screen-scroll" id="screenScroll">
+          <div class="screen-story">
+            <video id="demo" muted playsinline preload="auto" disablepictureinpicture
+                   poster="assets/asset-manager-poster.jpg" aria-label="Asset Manager demo: filtering assets by warranty and downloading a report">
+              <source src="assets/asset-manager-demo.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+
+      <div class="media-phone" aria-hidden="true">
+        <img src="assets/phone.webp" alt="" width="603" height="908">
+        <span class="tap-target">
+          <svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M8 2.5v11M2.5 8h11"/></svg>
+        </span>
+        <span class="cursor">
+          <svg viewBox="0 0 40 40">
+            <circle class="ripple" cx="20" cy="20" r="14" fill="none" stroke="#fff" stroke-width="2"/>
+            <circle cx="20" cy="20" r="14" fill="rgba(20,32,70,.28)" stroke="#fff" stroke-width="2.5"/>
+            <circle cx="20" cy="20" r="5" fill="#fff"/>
+          </svg>
+        </span>
+      </div>
+
+      <button class="screen-close" id="screenClose" type="button" aria-label="Close demo">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg>
+      </button>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  var hero = document.getElementById('hero');
+  var copy = document.getElementById('copy');
+  var track = hero.parentElement;
+  var anchor = document.getElementById('screenAnchor');
+  var scroller = document.getElementById('screenScroll');
+  var closeBtn = document.getElementById('screenClose');
+  var demo = document.getElementById('demo');
+  var waves = document.querySelector('.hero-waves');
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  demo.muted = true;
+
+  function playVideo(v) { try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
+  function setClass(name, on) { hero.classList.toggle(name, !!on); }
+
+  /* ── Background waves ── */
+  if (waves) {
+    waves.muted = true;
+    if (reduced) { waves.removeAttribute('autoplay'); waves.pause(); }
+    else {
+      playVideo(waves);
+      document.addEventListener('visibilitychange', function () { if (!document.hidden) playVideo(waves); });
+    }
+  }
+
+  /* ── Story loop ──
+     1 phone visible → 2 cursor glides to "Add Asset" → 3 tap
+     4 phone drops away; demo screen sharpens, grows, plays (15 s)
+     5 demo ends → screen blurs back, phone rises in → repeat */
+  var gen = 0;          // bump to cancel a running story
+  var mode = 'story';   // 'story' | 'expanded'
+
+  function wait(ms, g) {
+    return new Promise(function (res) { setTimeout(function () { res(g === gen); }, ms); });
+  }
+  function waitForDemoEnd(g) {
+    return new Promise(function (res) {
+      var done = false;
+      function finish() { if (done) return; done = true; demo.removeEventListener('ended', finish); clearTimeout(t); res(g === gen); }
+      demo.addEventListener('ended', finish);
+      var ms = isFinite(demo.duration) && demo.duration > 0 ? demo.duration * 1000 + 600 : 15600;
+      var t = setTimeout(finish, ms); // fallback if the video can't play
+    });
+  }
+  function resetStory() {
+    ['cursor-in', 'cursor-show', 'is-tapping', 'is-pressing', 'is-playing'].forEach(function (c) { setClass(c, false); });
+  }
+
+  async function runStory(opts) {
+    var g = ++gen;
+    resetStory();
+    demo.loop = false;
+    demo.pause();
+    try { demo.currentTime = 0; } catch (e) {}
+
+    if (opts && opts.enterPhone) {
+      setClass('phone-out', true);
+      if (!(await wait(60, g))) return;
+      setClass('phone-out', false);          // phone rises back in
+      if (!(await wait(900, g))) return;
+    } else {
+      setClass('phone-out', false);
+    }
+
+    while (true) {
+      if (!(await wait(600, g))) return;     // let the phone sit for a beat
+      setClass('cursor-in', true);            // 2 · glide to Add Asset
+      if (!(await wait(650, g))) return;
+      setClass('is-pressing', true);          // 3 · tap
+      setClass('is-tapping', true);
+      if (!(await wait(160, g))) return;
+      setClass('is-pressing', false);
+      if (!(await wait(420, g))) return;
+
+      setClass('cursor-in', false);           // 4 · phone out, demo in
+      setClass('phone-out', true);
+      if (!(await wait(140, g))) return;
+      setClass('is-tapping', false);
+      setClass('is-playing', true);
+      try { demo.currentTime = 0; } catch (e) {}
+      playVideo(demo);
+
+      if (!(await waitForDemoEnd(g))) return; // 5 · after the demo, loop
+      setClass('is-playing', false);
+      demo.pause();
+      if (!(await wait(450, g))) return;
+      try { demo.currentTime = 0; } catch (e) {}
+      setClass('phone-out', false);
+      if (!(await wait(800, g))) return;
+    }
+  }
+
+  /* ── Scroll-driven expand ── */
+  var progress = 0, lastY = window.scrollY, dir = 1, idleTimer = null, snapping = false;
+  var vw = 0, vh = 0;
+
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function ease(t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+
+  function measure() {
+    vw = document.documentElement.clientWidth;
+    vh = window.innerHeight;
+  }
+
+  function scrollRange() { return Math.max(1, track.offsetHeight - hero.offsetHeight); }
+
+  function render() {
+    var p = clamp(window.scrollY / scrollRange(), 0, 1);
+    progress = p;
+    var e = ease(p);
+
+    // Copy lifts away and fades
+    copy.style.opacity = String(clamp(1 - p * 1.8, 0, 1));
+    copy.style.transform = 'translateY(' + (-p * vh * .08).toFixed(1) + 'px)';
+    copy.style.visibility = p > .6 ? 'hidden' : 'visible';
+
+    // Screen: from its story position to centered, 90% of viewport height
+    var r = anchor.getBoundingClientRect();
+    var heroR = hero.getBoundingClientRect();
+    var grow = parseFloat(getComputedStyle(hero).getPropertyValue('--screen-grow')) || 1;
+    var ar = r.width / r.height;
+    var targetH = Math.min(vh * .9, (vw - 32) / ar);
+    var targetW = targetH * ar;
+    var s2 = targetH / (r.height * grow);
+    // the story scale grows from the bottom edge, which lifts the visual centre
+    var o = -(grow - 1) * r.height / 2;
+    var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    var goalX = heroR.left + vw / 2, goalY = heroR.top + vh / 2;
+    var s = 1 + (s2 - 1) * e;
+    var dx = (goalX - cx) * e;
+    var dy = (cy + o) + (goalY - (cy + o)) * e - cy - o * s;
+    scroller.style.transform = p > 0
+      ? 'translate(' + dx.toFixed(2) + 'px,' + dy.toFixed(2) + 'px) scale(' + s.toFixed(4) + ')'
+      : '';
+
+    // Close button: beside the top-right corner if there's room, else above it, else inside
+    var top = goalY - targetH / 2 - heroR.top, right = goalX + targetW / 2 - heroR.left;
+    var stageR = closeBtn.offsetParent.getBoundingClientRect();
+    var bx, by, size = 40, gap = 12;
+    if (vw - right >= size + gap * 2) { bx = right + gap; by = top; }
+    else if (top >= size + gap * 2) { bx = right - size; by = top - size - gap; }
+    else { bx = right - size - gap; by = top + gap; }
+    closeBtn.style.left = (bx - (stageR.left - heroR.left)).toFixed(1) + 'px';
+    closeBtn.style.top = (by - (stageR.top - heroR.top)).toFixed(1) + 'px';
+
+    // Mode switches
+    if (p > 0.001 && mode === 'story') {
+      mode = 'expanded';
+      gen++;                                  // stop the story
+      resetStory();
+      setClass('phone-out', true);
+      demo.loop = true;
+      playVideo(demo);
+    }
+    if (p >= .98) setClass('is-expanded', true);
+    else if (p < .9) setClass('is-expanded', false);
+    if (p > 0.001) setClass('is-playing', true);
+
+    if (p <= 0.001 && mode === 'expanded' && !snapping) {
+      mode = 'story';
+      setClass('is-playing', false);
+      runStory({ enterPhone: true });
+    }
+  }
+
+  var ticking = false;
+  function onScroll() {
+    var y = window.scrollY;
+    if (y !== lastY) dir = y > lastY ? 1 : -1;
+    lastY = y;
+    if (!ticking) { ticking = true; requestAnimationFrame(function () { ticking = false; render(); }); }
+
+    // Snap: once scrolling settles mid-way, finish in the direction of travel
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function () {
+      var p = progress;
+      if (p > 0.001 && p < 0.999) {
+        snapTo(dir > 0 ? 1 : 0);
+      } else {
+        snapping = false;
+        render();
+      }
+    }, 120);
+  }
+
+  function snapTo(target) {
+    snapping = true;
+    window.scrollTo({ top: Math.round(target * scrollRange()), behavior: reduced ? 'auto' : 'smooth' });
+  }
+
+  closeBtn.addEventListener('click', function () { dir = -1; snapTo(0); });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape' && progress > .5) { dir = -1; snapTo(0); }
+  });
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', function () { measure(); render(); });
+  measure();
+  render();
+
+  if (window.scrollY > 0) onScroll();   // restored mid-scroll: settle it
+  else runStory();
+})();
+</script>
+
+</body></html>
