@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>PartsConnect Launch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Montserrat:wght@700&display=swap">
+<style>
+/* Layout: full-bleed, single-screen hero (sits inside the Bluon app, below search) —
+   centered copy, then a media "stage" pinned to the bottom edge: a Bluon part
+   screen on a device, flanked by supplier tiles. A scripted story loops: cursor taps
+   "Available at my suppliers", the button checks, and the suppliers that carry the
+   part pop in around the device. Sister page to Asset-Manager-Launch; same tokens.
+   Single committed look: deep-blue hero. Not theme-switched on purpose. */
+:root {
+  color-scheme: light;
+  --bluon: #1460F5;
+  --ink: #1B2235;
+  --ink-soft: #5B6478;
+  --line: #E3E7EF;
+  --hero-deep: #071A4F;
+  --on-hero: #FFFFFF;
+  --on-hero-soft: rgba(255,255,255,.88);
+  --cta: #34F08C;
+  --cta-ink: #04142E;
+  --found: #12B76A;
+
+  --f-display: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --gutter: clamp(16px, 2vw, 24px);
+  --ease-out: cubic-bezier(.2, .8, .2, 1);
+  --ease-back: cubic-bezier(.34, 1.4, .64, 1);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--hero-deep);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+img { max-width: 100%; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--cta); outline-offset: 3px; }
+
+/* ───────── Hero ─────────
+   Everything is sized from one unit (--u) that tracks whichever of width/height
+   is tighter, so the composition scales as one piece. */
+.hero {
+  --u: min(1vw, 1.55vh);
+  --u: min(1vw, 1.55svh);
+  --dev-w: calc(var(--u) * 34);
+  --tile-w: calc(var(--u) * 13);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex; flex-direction: column;
+  height: 100vh;
+  height: 100svh;
+  min-height: 520px;
+  background: var(--hero-deep);
+  color: var(--on-hero);
+  padding-inline: var(--gutter);
+}
+.hero-bg {
+  position: absolute; inset: 0; z-index: -1;
+  background: var(--hero-deep) url("assets/hero-blur.jpg") center / cover no-repeat;
+}
+/* soft spotlight behind the device */
+.hero-bg::after {
+  content: ""; position: absolute;
+  left: 50%; bottom: -20%;
+  width: calc(var(--dev-w) * 2.6); aspect-ratio: 1;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(20,96,245,.45), rgba(20,96,245,0));
+}
+
+.copy {
+  flex: 1 1 auto; min-height: 0;
+  width: 100%; max-width: max(min(100%, 560px), calc(var(--u) * 56)); margin-inline: auto;
+  padding-block: calc(var(--u) * 3) calc(var(--u) * 3.5);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+}
+.eyebrow {
+  margin: 0 0 max(16px, calc(var(--u) * 2));
+  font: 400 max(12px, calc(var(--u) * 1))/1.2 var(--f-mono);
+  letter-spacing: .08em; text-transform: uppercase;
+}
+h1 {
+  margin: 0;
+  font: 700 max(26px, calc(var(--u) * 2.9))/1.12 var(--f-display);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.lede {
+  margin: max(14px, calc(var(--u) * 1.7)) 0 0;
+  max-width: min(100%, max(320px, calc(var(--u) * 48)));
+  font: 400 max(15px, calc(var(--u) * 1.2))/1.45 var(--f-body);
+  color: var(--on-hero-soft);
+  text-wrap: pretty;
+}
+.lede span { display: block; }
+.cta {
+  margin-top: max(20px, calc(var(--u) * 2.1));
+  display: inline-flex; align-items: center; justify-content: center;
+  height: max(42px, calc(var(--u) * 2.9)); padding-inline: max(22px, calc(var(--u) * 1.6));
+  border-radius: 999px;
+  background: var(--cta); color: var(--cta-ink);
+  font: 600 max(16px, calc(var(--u) * 1.12))/1 var(--f-body); text-decoration: none;
+  box-shadow: 0 6px 24px rgba(52,240,140,.25);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.cta:hover { transform: translateY(-1px); box-shadow: 0 10px 32px rgba(52,240,140,.38); }
+.cta-note {
+  margin: max(10px, calc(var(--u) * .8)) 0 0;
+  font: 400 max(11px, calc(var(--u) * .8))/1 var(--f-mono); letter-spacing: .04em;
+  color: var(--on-hero-soft);
+}
+
+/* ───────── Media stage ─────────
+   Pinned to the hero's bottom edge; shows the top ~65% of the device. */
+.stage {
+  position: relative;
+  flex: none;
+  width: 100%;
+  height: calc(var(--dev-w) * .66);
+}
+
+/* Device: a tablet with the Bluon part screen. Its contents are sized from --d
+   (1% of the device width) so the screen scales as one piece. */
+.device {
+  --d: calc(var(--dev-w) / 100);
+  position: absolute; left: 50%; top: 0;
+  width: var(--dev-w);
+  transform: translateX(-50%);
+  padding: calc(var(--d) * 3) calc(var(--d) * 3) 0;
+  border-radius: calc(var(--d) * 7) calc(var(--d) * 7) 0 0;
+  background: #10131C;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.14), 0 30px 80px rgba(3, 12, 44, .55);
+}
+.screen {
+  position: relative;
+  height: calc(var(--dev-w) * .8);
+  border-radius: calc(var(--d) * 4) calc(var(--d) * 4) 0 0;
+  overflow: hidden;
+  background: #F4F6FA;
+  color: var(--ink);
+  font-family: var(--f-body);
+}
+.app-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: calc(var(--d) * 3.2) calc(var(--d) * 4.5) calc(var(--d) * 2.6);
+  background: #fff;
+}
+.app-bar img { height: calc(var(--d) * 4.6); width: auto; display: block; }
+.app-bar .menu { width: calc(var(--d) * 4); height: calc(var(--d) * 2.6); display: grid; align-content: space-between; }
+.app-bar .menu i { display: block; height: max(1px, calc(var(--d) * .4)); border-radius: 2px; background: var(--ink-soft); }
+
+.card {
+  margin: calc(var(--d) * 2.4) calc(var(--d) * 3.4) 0;
+  padding: calc(var(--d) * 3);
+  border-radius: calc(var(--d) * 2.4);
+  background: #fff;
+  box-shadow: 0 1px 0 var(--line);
+}
+.part { display: flex; gap: calc(var(--d) * 3); align-items: center; }
+.part-thumb {
+  flex: none;
+  width: calc(var(--d) * 13); aspect-ratio: 1;
+  border-radius: calc(var(--d) * 1.8);
+  background: #fff; border: 1px solid var(--line);
+  display: grid; place-items: center; overflow: hidden;
+}
+.part-thumb img { height: 88%; width: auto; mix-blend-mode: multiply; }
+.part-title { margin: 0; font-size: calc(var(--d) * 3.5); font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; }
+.part-meta { margin: calc(var(--d) * 1) 0 0; font: 400 calc(var(--d) * 2.6)/1.2 var(--f-mono); color: var(--ink-soft); }
+
+.avail {
+  position: relative;
+  margin-top: calc(var(--d) * 3);
+  width: 100%;
+  height: calc(var(--d) * 8);
+  border: 0; border-radius: 999px;
+  background: #0E121C; color: #fff;
+  font: 600 calc(var(--d) * 3)/1 var(--f-body);
+  display: grid; place-items: center;
+  overflow: hidden;
+  transition: background .35s ease, transform .14s ease;
+}
+.avail > span {
+  grid-area: 1 / 1;
+  display: inline-flex; align-items: center; gap: calc(var(--d) * 1.6);
+  transition: opacity .25s ease, transform .3s var(--ease-out);
+}
+.avail .s-checking, .avail .s-found { opacity: 0; transform: translateY(60%); }
+.avail .spin {
+  width: calc(var(--d) * 3); height: calc(var(--d) * 3);
+  border: max(1.5px, calc(var(--d) * .5)) solid rgba(255,255,255,.3); border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+.avail .tick { width: calc(var(--d) * 3.2); height: calc(var(--d) * 3.2); }
+@keyframes spin { to { transform: rotate(360deg); } }
+.hero.is-pressing .avail { transform: scale(.97); }
+.hero.is-checking .avail .s-idle,
+.hero.is-found .avail .s-idle { opacity: 0; transform: translateY(-60%); }
+.hero.is-checking .avail .s-checking { opacity: 1; transform: none; }
+.hero.is-found .avail { background: var(--found); }
+.hero.is-found .avail .s-found { opacity: 1; transform: none; }
+
+.section-head {
+  display: flex; align-items: center; gap: calc(var(--d) * 1.6);
+  margin: calc(var(--d) * 4) calc(var(--d) * 4.4) calc(var(--d) * 2);
+  font-size: calc(var(--d) * 3); font-weight: 600;
+}
+.count {
+  min-width: calc(var(--d) * 5); height: calc(var(--d) * 5); padding-inline: calc(var(--d) * 1.2);
+  border-radius: 999px; background: #E6EEFE; color: var(--bluon);
+  display: inline-grid; place-items: center;
+  font-size: calc(var(--d) * 2.5);
+}
+.row {
+  display: flex; align-items: center; gap: calc(var(--d) * 2.4);
+  margin: 0 calc(var(--d) * 3.4) calc(var(--d) * 1.6);
+  padding: calc(var(--d) * 2.4) calc(var(--d) * 3);
+  border-radius: calc(var(--d) * 2);
+  background: #fff;
+}
+.row-main { flex: 1; min-width: 0; }
+.row-name { margin: 0; font-size: calc(var(--d) * 2.7); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row-num { margin: calc(var(--d) * .6) 0 0; font: 400 calc(var(--d) * 2.3)/1.2 var(--f-mono); color: var(--ink-soft); }
+.fit {
+  flex: none;
+  padding: calc(var(--d) * .9) calc(var(--d) * 1.6);
+  border-radius: calc(var(--d) * 1);
+  background: #E6EEFE; color: var(--bluon);
+  font-size: calc(var(--d) * 2.2); font-weight: 600;
+}
+.row-btn {
+  flex: none;
+  padding: calc(var(--d) * 1.4) calc(var(--d) * 2.6);
+  border-radius: 999px; background: #0E121C; color: #fff;
+  font-size: calc(var(--d) * 2.3); font-weight: 600;
+}
+.row.skeleton .row-name, .row.skeleton .row-num {
+  height: calc(var(--d) * 2.2); border-radius: 4px; background: #ECEFF5;
+}
+.row.skeleton .row-name { width: 70%; }
+.row.skeleton .row-num { width: 40%; }
+.row.skeleton .fit, .row.skeleton .row-btn { color: transparent; background: #ECEFF5; }
+
+/* Cursor: a soft touch-dot that glides to the button and presses.
+   JS sets --cx/--cy (the button's centre, relative to the device). */
+.cursor {
+  position: absolute; z-index: 3;
+  left: 78%; top: 70%;
+  width: calc(var(--dev-w) * .1); aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    left .6s cubic-bezier(.3, .1, .2, 1),
+    top .6s cubic-bezier(.3, .1, .2, 1),
+    opacity .18s ease;
+}
+.cursor svg { width: 100%; height: 100%; overflow: visible; transition: transform .14s ease; }
+.cursor .ripple { transform-origin: 50% 50%; transform-box: fill-box; opacity: 0; }
+.hero.cursor-in .cursor { opacity: 1; left: var(--cx, 50%); top: var(--cy, 40%); }
+.hero.is-pressing .cursor svg { transform: scale(.78); }
+.hero.is-pressing .cursor .ripple { animation: ripple .6s ease-out forwards; }
+@keyframes ripple {
+  0%   { opacity: .9; transform: scale(.6); }
+  100% { opacity: 0;  transform: scale(2.3); }
+}
+
+/* ───────── Supplier tiles ─────────
+   Three per side, fanned like the bluon.com PartsConnect art. Each pops in with a
+   stagger (--i) once the part is found. */
+.tiles { position: absolute; inset: 0; pointer-events: none; }
+.tile {
+  --x: 0px; --y: 0%;
+  position: absolute; top: var(--y);
+  width: var(--tile-w); aspect-ratio: 360 / 126;
+  padding: calc(var(--tile-w) * .07) calc(var(--tile-w) * .09);
+  border-radius: calc(var(--tile-w) * .08);
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(3, 12, 44, .35);
+  opacity: 0;
+  transform: translateY(18px) scale(.86);
+  transition: opacity .2s ease, transform .3s var(--ease-out);
+}
+.tile img { display: block; width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+.tile.l { right: calc(50% + var(--dev-w) / 2 + var(--x)); }
+.tile.r { left: calc(50% + var(--dev-w) / 2 + var(--x)); }
+.tile .ok {
+  position: absolute; top: calc(var(--tile-w) * -.06); right: calc(var(--tile-w) * -.06);
+  width: max(18px, calc(var(--tile-w) * .15)); aspect-ratio: 1;
+  border-radius: 50%; background: var(--found);
+  box-shadow: 0 0 0 2px #fff;
+  display: grid; place-items: center;
+  transform: scale(0);
+  transition: transform .3s var(--ease-back);
+}
+.tile .ok svg { width: 58%; height: 58%; }
+.hero.is-found .tile {
+  opacity: 1; transform: none;
+  transition: opacity .25s ease calc(var(--i) * 90ms), transform .5s var(--ease-back) calc(var(--i) * 90ms);
+}
+.hero.is-found .tile .ok { transform: scale(1); transition-delay: calc(var(--i) * 90ms + 260ms); }
+
+/* ───────── Responsive ─────────
+   Portrait (phones, portrait tablets): width is the tight side. The device takes
+   most of the width; there's no room beside it, so the tiles pop in as a 3×2
+   grid above it instead. */
+@media (max-aspect-ratio: 4/5) {
+  .hero {
+    --dev-w: min(84vw, 42svh);
+    --tile-w: min(calc((100vw - 2 * var(--gutter) - 20px) / 3), 150px);
+    --tiles-h: calc(var(--tile-w) * .35 * 2 + 10px + 22px);
+  }
+  .copy { max-width: 560px; }
+  .lede span { display: inline; }
+  .stage { height: calc(var(--dev-w) * .62 + var(--tiles-h)); }
+  .device { top: var(--tiles-h); }
+  .tiles {
+    inset: 0 auto auto 50%;
+    transform: translateX(-50%);
+    display: grid; grid-template-columns: repeat(3, var(--tile-w)); gap: 10px;
+  }
+  .tile, .tile.l, .tile.r { position: relative; top: auto; left: auto; right: auto; }
+}
+
+/* Tablet (portrait and landscape) */
+@media (min-width: 641px) and (max-width: 1024px) {
+  h1 { font-size: 32px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; transition-delay: 0s !important; animation-duration: .01ms !important; }
+  .avail .spin { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<main class="hero" id="hero" aria-labelledby="hero-title">
+  <div class="hero-bg" aria-hidden="true"></div>
+
+  <div class="copy">
+    <p class="eyebrow">Introducing PartsConnect</p>
+    <h1 id="hero-title">Find compatible parts sold by your suppliers.</h1>
+    <p class="lede">
+      <span>Bluon does the cross-reference research, finding the correct part and every known replacement, then connects you to the distributors you already use for a quote or a fast pickup.</span>
+      <span>Stop guessing. Stop calling.</span>
+    </p>
+    <a class="cta" href="https://www.bluon.com/partsconnect" target="_blank" rel="noopener">See how it works</a>
+    <p class="cta-note">Works with the suppliers you already use</p>
+  </div>
+
+  <div class="stage">
+    <!-- Illustrative app screen: the part and replacement shown match the PartsConnect art on bluon.com -->
+    <div class="device" id="device" aria-hidden="true">
+      <div class="screen">
+        <div class="app-bar">
+          <img src="assets/bluon-logo.svg" alt="" width="722" height="247">
+          <span class="menu"><i></i><i></i><i></i></span>
+        </div>
+
+        <div class="card">
+          <div class="part">
+            <span class="part-thumb"><img src="assets/compressor.jpg" alt="" width="266" height="400"></span>
+            <div>
+              <p class="part-title">Scroll Compressor 24000 Btu/h R410A 208‑230V 1PH</p>
+              <p class="part-meta">Copeland · ZP24K5E-PFV</p>
+            </div>
+          </div>
+          <span class="avail" id="avail">
+            <span class="s-idle">Available at my suppliers</span>
+            <span class="s-checking"><i class="spin"></i>Checking your suppliers…</span>
+            <span class="s-found">
+              <svg class="tick" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg>
+              Available at 6 of your suppliers
+            </span>
+          </span>
+        </div>
+
+        <div class="section-head">Known Replacements <span class="count">10</span></div>
+        <div class="row">
+          <div class="row-main">
+            <p class="row-name">Advanced Distributors Products (ADP)</p>
+            <p class="row-num">W51-16CJA1-1</p>
+          </div>
+          <span class="fit">Direct fit</span>
+          <span class="row-btn">Suppliers</span>
+        </div>
+        <div class="row skeleton"><div class="row-main"><p class="row-name"></p><p class="row-num"></p></div><span class="fit">Direct fit</span><span class="row-btn">Suppliers</span></div>
+        <div class="row skeleton"><div class="row-main"><p class="row-name"></p><p class="row-num"></p></div><span class="fit">Direct fit</span><span class="row-btn">Suppliers</span></div>
+      </div>
+
+      <span class="cursor">
+        <svg viewBox="0 0 40 40">
+          <circle class="ripple" cx="20" cy="20" r="14" fill="none" stroke="#fff" stroke-width="2"/>
+          <circle cx="20" cy="20" r="14" fill="rgba(20,32,70,.28)" stroke="#fff" stroke-width="2.5"/>
+          <circle cx="20" cy="20" r="5" fill="#fff"/>
+        </svg>
+      </span>
+    </div>
+
+    <div class="tiles" role="img" aria-label="Distributors that carry the part, including Baker Distributing, F.W. Webb, Trane Supply, Carrier, Daikin and Winsupply">
+      <span class="tile l" style="--i:0; --y:6%;  --x:calc(var(--u) * 2.5)"><img src="assets/baker.jpg" alt="" width="360" height="125"><i class="ok"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg></i></span>
+      <span class="tile r" style="--i:1; --y:6%;  --x:calc(var(--u) * 2.5)"><img src="assets/carrier.jpg" alt="" width="360" height="125"><i class="ok"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg></i></span>
+      <span class="tile l" style="--i:2; --y:36%; --x:calc(var(--u) * 4.5)"><img src="assets/webb.jpg" alt="" width="360" height="126"><i class="ok"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg></i></span>
+      <span class="tile r" style="--i:3; --y:36%; --x:calc(var(--u) * 4.5)"><img src="assets/daikin.jpg" alt="" width="360" height="125"><i class="ok"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg></i></span>
+      <span class="tile l" style="--i:4; --y:66%; --x:calc(var(--u) * 2)"><img src="assets/trane.jpg" alt="" width="360" height="128"><i class="ok"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg></i></span>
+      <span class="tile r" style="--i:5; --y:66%; --x:calc(var(--u) * 2)"><img src="assets/winsupply.jpg" alt="" width="360" height="127"><i class="ok"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg></i></span>
+    </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  var hero = document.getElementById('hero');
+  var device = document.getElementById('device');
+  var avail = document.getElementById('avail');
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function setClass(name, on) { hero.classList.toggle(name, !!on); }
+
+  // Point the cursor at the button's centre, in % of the device box
+  function aimCursor() {
+    var d = device.getBoundingClientRect(), b = avail.getBoundingClientRect();
+    if (!d.width || !d.height) return;
+    hero.style.setProperty('--cx', ((b.left + b.width / 2 - d.left) / d.width * 100).toFixed(2) + '%');
+    hero.style.setProperty('--cy', ((b.top + b.height / 2 - d.top) / d.height * 100).toFixed(2) + '%');
+  }
+
+  // Reduced motion: show the end state, no loop
+  if (reduced) { aimCursor(); setClass('is-found', true); return; }
+
+  /* ── Story loop ──
+     1 part screen visible → 2 cursor glides to "Available at my suppliers" → 3 tap
+     4 button checks your suppliers → 5 suppliers pop in around the device
+     6 hold, then everything clears → repeat */
+  var gen = 0;
+  function wait(ms, g) {
+    return new Promise(function (res) { setTimeout(function () { res(g === gen); }, ms); });
+  }
+  function reset() {
+    ['cursor-in', 'is-pressing', 'is-checking', 'is-found'].forEach(function (c) { setClass(c, false); });
+  }
+
+  async function runStory() {
+    var g = ++gen;
+    reset();
+    while (true) {
+      if (!(await wait(900, g))) return;     // let the screen sit for a beat
+      aimCursor();
+      setClass('cursor-in', true);           // 2 · glide to the button
+      if (!(await wait(700, g))) return;
+      setClass('is-pressing', true);         // 3 · tap
+      if (!(await wait(160, g))) return;
+      setClass('is-pressing', false);
+      setClass('is-checking', true);         // 4 · checking
+      if (!(await wait(300, g))) return;
+      setClass('cursor-in', false);
+      if (!(await wait(900, g))) return;
+      setClass('is-checking', false);        // 5 · found
+      setClass('is-found', true);
+      if (!(await wait(4200, g))) return;    // 6 · hold, then clear
+      setClass('is-found', false);
+      if (!(await wait(700, g))) return;
+    }
+  }
+
+  // Pause the loop while the frame is hidden; restart fresh when it's back
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { gen++; reset(); } else runStory();
+  });
+  window.addEventListener('resize', aimCursor);
+
+  runStory();
+})();
+</script>
+
+</body>
+</html>
