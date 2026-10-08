@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "b4b-iframes",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["-e", "const h=require('http'),f=require('fs'),p=require('path'),r=process.argv[1],t={'.html':'text/html','.svg':'image/svg+xml','.jpg':'image/jpeg','.webp':'image/webp','.mp4':'video/mp4'};h.createServer((q,s)=>{let u=decodeURIComponent(q.url.split('?')[0]);let fp=p.join(r,u);if(u.endsWith('/'))fp=p.join(fp,'index.html');f.readFile(fp,(e,d)=>{if(e){s.writeHead(404);return s.end('not found')}s.writeHead(200,{'Content-Type':t[p.extname(fp)]||'application/octet-stream'});s.end(d)})}).listen(4173,()=>console.log('http://localhost:4173'))", "/Users/brianprouty/Documents/GitHub/B4B-iFrames"],
+      "port": 4173
+    }
+  ]
+}
