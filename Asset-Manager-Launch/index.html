@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Asset Manager Launch</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -123,6 +123,17 @@ h1 {
   transition: transform .15s ease, box-shadow .15s ease;
 }
 .cta:hover { transform: translateY(-1px); box-shadow: 0 10px 32px rgba(52,240,140,.38); }
+.cta-link {
+  margin-top: max(12px, calc(var(--u) * .9));
+  padding: 6px 10px;
+  font: 500 max(15px, calc(var(--u) * 1.05))/1.2 var(--f-body);
+  color: var(--on-hero);
+  text-decoration: underline;
+  text-decoration-color: rgba(255,255,255,.45);
+  text-underline-offset: 4px;
+  transition: text-decoration-color .15s ease;
+}
+.cta-link:hover { text-decoration-color: var(--on-hero); }
 .cta-note {
   margin: max(10px, calc(var(--u) * .8)) 0 0;
   font: 400 max(11px, calc(var(--u) * .8))/1 var(--f-mono); letter-spacing: .04em;
@@ -292,9 +303,8 @@ h1 {
         <span>Your equipment list is a job list. Send it over and we’ll flag aging units, R‑22 systems, expiring warranties, and which ones are ready to replace. No tech adoption required.</span>
         <span>No List? We’ll pull it from your FSM.</span>
       </p>
-      <a class="cta" href="#top">Show me how!</a>
-      <p class="cta-note">15-minute demo</p>
-    </div>
+      <a class="cta" href="mailto:sales@bluon.com">Contact your Bluon rep</a>
+      <a class="cta-link" href="https://www.bluon.com/asset-manager" target="_blank" rel="noopener">Learn more</a>    </div>
 
     <div class="stage">
       <div class="screen-anchor" id="screenAnchor">
